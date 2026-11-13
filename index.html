@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI 商業與自動化魔鬼教練 — iOS 實戰訓練終端</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --aqua: #5CD6D6;
+            --aqua-dark: #2BA8A8;
+            --bg-dark: #0A0E14;
+            --card-dark: #131924;
+            --border-dark: #222D3F;
+        }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+        }
+        body {
+            background-color: #06090E;
+            color: #F1F5F9;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0A0E14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #222D3F;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5CD6D6;
+        }
+        .aqua-glow {
+            box-shadow: 0 0 20px rgba(92, 214, 214, 0.18);
+        }
+        .aqua-border-glow {
+            border-color: rgba(92, 214, 214, 0.45);
+        }
+        .ios-blur {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .tab-active {
+            color: #5CD6D6;
+            border-bottom: 2px solid #5CD6D6;
+        }
+        .nav-pill-active {
+            background: rgba(92, 214, 214, 0.15);
+            color: #5CD6D6;
+            border: 1px solid rgba(92, 214, 214, 0.4);
+        }
+        pre, code {
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#070A0F] text-slate-100 select-none">
+
+    <!-- Top iOS Status & App Header -->
+    <header class="sticky top-0 z-40 bg-[#0A0E14]/90 ios-blur border-b border-[#1E293B] px-4 py-3">
+        <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#5CD6D6] to-[#1E6B7B] flex items-center justify-center shadow-lg aqua-glow">
+                    <span class="text-slate-950 font-black text-lg tracking-tighter">AI</span>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-white">AI 商業頭腦魔鬼教練</h1>
+                        <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-[#5CD6D6]/15 text-[#5CD6D6] border border-[#5CD6D6]/40 rounded-full">iOS TestFlight v1.4</span>
+                    </div>
+                    <p class="text-xs text-slate-400">唯一目標：用 AI 自動化生產軟體 + 持續監控管理，穩定創造現金流</p>
+                </div>
+            </div>
+
+            <!-- Strict Rules Banner Toggle & App Store Export -->
+            <div class="flex items-center gap-2">
+                <button id="btn-rules-modal" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#131924] hover:bg-[#1C2536] text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                    <span>教練 5 大鐵則</span>
+                </button>
+                <button id="btn-ios-modal" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#5CD6D6] hover:bg-[#4bc2c2] text-slate-950 transition shadow-sm">
+                    App Store 上架包
+                </button>
+            </div>
+        </div>
+
+        <!-- Primary Navigation Bar (6 Modules) -->
+        <nav class="max-w-5xl mx-auto mt-3 flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar" id="main-nav">
+            <button data-tab="tab-daily" class="nav-btn nav-pill-active px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition flex items-center gap-1.5">
+                <span>01. 每日變現練習</span>
+            </button>
+            <button data-tab="tab-60min" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white bg-[#131924] border border-transparent whitespace-nowrap transition flex items-center gap-1.5">
+                <span>02. 60分鐘極速開發</span>
+            </button>
+            <button data-tab="tab-pipeline" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white bg-[#131924] border border-transparent whitespace-nowrap transition flex items-center gap-1.5">
+                <span>03. 軟體生產流水線</span>
+            </button>
+            <button data-tab="tab-monitor" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white bg-[#131924] border border-transparent whitespace-nowrap transition flex items-center gap-1.5">
+                <span>04. 自動化監控與ROI</span>
+            </button>
+            <button data-tab="tab-audit" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white bg-[#131924] border border-transparent whitespace-nowrap transition flex items-center gap-1.5">
+                <span>05. 每日強制檢討</span>
+            </button>
+            <button data-tab="tab-weekly" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white bg-[#131924] border border-transparent whitespace-nowrap transition flex items-center gap-1.5">
+                <span>06. 每週商業對齊</span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-5 space-y-6">
+
+        <!-- Coach Live Persona Bar -->
+        <div class="bg-gradient-to-r from-[#131924] via-[#162030] to-[#131924] border-l-4 border-[#5CD6D6] rounded-r-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                    <span class="text-[11px] font-extrabold uppercase tracking-widest text-[#5CD6D6]">COACH DIRECTIVE // 極度嚴格模式</span>
+                    <span id="coach-Check-Badge" class="text-[11px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-semibold">零雞湯・結果導向</span>
+                </div>
+                <p id="coach-live-quote" class="text-xs sm:text-sm text-slate-200 font-medium">
+                    「不要跟我談你學了多少 AI 模型。今天結束前，沒有跑通可收費的自動化流程或留下標準化資產，今天就是零分。」
+                </p>
+            </div>
+            <div class="flex items-center gap-4 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-800">
+                <div class="text-right">
+                    <div class="text-[10px] text-slate-400 uppercase">今日訓練完成度</div>
+                    <div id="global-progress-text" class="text-base font-black text-[#5CD6D6]">25% (1/4)</div>
+                </div>
+                <div class="w-16 bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                    <div id="global-progress-bar" class="bg-[#5CD6D6] h-full transition-all duration-300" style="width: 25%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             MODULE 1: 【每日 AI 變現練習】
+             ========================================== -->
+        <section id="tab-daily" class="tab-panel space-y-5">
+            <!-- User Resource Input Card -->
+            <div class="bg-[#131924] border border-[#222D3F] rounded-2xl p-4 sm:p-5 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                        <h2 class="text-base font-extrabold text-white flex items-center gap-2">
+                            <span class="text-[#5CD6D6]">【每日 AI 變現練習】</span> 狀態登錄與診斷
+                        </h2>
+                        <p class="text-xs text-slate-400">誠實填寫目前資源，若輸入太模糊或空想，教練將直接退件要求重寫。</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="btn-preset-vague" class="px-2.5 py-1 rounded text-[11px] bg-rose-950/60 hover:bg-rose-900/70 text-rose-300 border border-rose-700/50 transition">
+                            測試「空想模糊輸入」
+                        </button>
+                        <button id="btn-preset-solid" class="px-2.5 py-1 rounded text-[11px] bg-emerald-950/60 hover:bg-emerald-900/70 text-emerald-300 border border-emerald-700/50 transition">
+                            載入「室內裝修/工程實戰資源」
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1">今天日期</label>
+                        <input type="date" id="daily-date" value="2026-11-13" class="w-full bg-[#0A0E14] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:border-[#5CD6D6] focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1">我目前的程度（誠實填寫）</label>
+                        <select id="daily-level" class="w-full bg-[#0A0E14] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:border-[#5CD6D6] focus:outline-none">
+                            <option value="初階">初階（剛開始用 AI 寫單一腳本，常手動改錯）</option>
+                            <option value="中階" selected>中階（具備 Python/GUI 與標單自動化經驗，待建立穩定流水線）</option>
+                            <option value="高階">高階（已有全自動 CI/CD 與監控，專注規模化複製與轉售）</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1">目標商業模式</label>
+                        <select id="daily-biz-model" class="w-full bg-[#0A0E14] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:border-[#5CD6D6] focus:outline-none">
+                            <option value="內部工具轉售" selected>內部工具轉售（工程標單稽核 / 價差比對工具轉售同業）</option>
+                            <option value="垂直微型 SaaS">垂直微型 SaaS（室內裝修廠商請款與毛利 30% 控管雲端版）</option>
+                            <option value="自動化代工服務">自動化代工服務（代客建立公共工程文件自動查核流程）</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">我目前手上有的資源（時間、技能、現有產品、客群、資金等）</label>
+                    <textarea id="daily-resources" rows="2" class="w-full bg-[#0A0E14] border border-slate-700 rounded-lg p-3 text-xs text-white focus:border-[#5CD6D6] focus:outline-none leading-relaxed">每日可投入 90 分鐘；具備 Python、CustomTkinter、Streamlit、Excel 自動化與室內裝修標單排雷實戰經驗；手上有裝修工程同行與協力廠商名單；目標毛利率 30%（廠商成本上限 70%）。</textarea>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                    <div id="daily-critique-box" class="flex-1 text-xs px-3 py-2 rounded-lg bg-emerald-950/40 border border-emerald-700/40 text-emerald-200">
+                        <strong class="text-emerald-400">【教練診斷通過】</strong> 資源盤點具體。你有明確的「裝修標單稽核與成本控管」垂直痛點，禁止去捲通用型聊天機器人，直接切入「內部工具轉售」與「同業代審服務」。
+                    </div>
+                    <button id="btn-generate-daily" class="px-4 py-2.5 rounded-xl text-xs font-extrabold bg-[#5CD6D6] hover:bg-[#4bc2c2] text-slate-950 transition shadow-md shrink-0">
+                        執行教練排程與嚴格審核
+                    </button>
+                </div>
+            </div>
+
+            <!-- 5-Part Structured Daily Plan Output -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- 1. 今日練習目標 -->
+                <div class="bg-[#131924] border border-[#222D3F] rounded-2xl p-4 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-black uppercase tracking-wider text-[#5CD6D6]">1. 今日練習目標（具體、可衡量）</span>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">時限：60 分鐘</span>
+                    </div>
+                    <p id="plan-goal" class="text-xs sm:text-sm text-white font-bold leading-relaxed">
+                        在 60 分鐘內，用 AI 將「廠商報價與合約標單價差比對」封裝成可獨立執行的 CLI/Web 稽核工具，輸入任意 CSV/Excel 即自動標出「價差超過 10 萬或毛利低於 30%」的異常項目，並在 3 秒內輸出可交付給業主或同業的稽核報告。
+                    </p>
+                    <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+                        <span>明確成功標準：零手動改 Code、通過 3 組測試案例、含錯誤日誌</span>
+                        <span class="text-emerald-400 font-bold">可變現定價：NT$ 3,500/次 或 月租 NT$ 1,200</span>
+                    </div>
+                </div>
+
+                <!-- 3. 練習時的嚴格要求 -->
+                <div class="bg-[#131924] border border-rose-900/50 rounded-2xl p-4 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-black uppercase tracking-wider text-rose-400">3. 練習時的嚴格要求（盯緊錯誤與偷懶）</span>
+                        <span class="text-[11px] px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800">違規即重來</span>
+                    </div>
+                    <ul id="plan-strict-rules" class="text-xs text-slate-200 space-y-1.5 list-disc pl-4 leading-relaxed">
+                        <li><strong>禁止手動微調美化 UI：</strong> 功能沒跑通、沒有產出 JSON/CSV 報表前，花超過 3 分鐘改顏色字體一律視為逃避核心問題。</li>
+                        <li><strong>禁止肉眼查錯：</strong> 遇到報錯不准自己一行行讀 Traceback，必須把完整錯誤訊息 + 預期輸入輸出餵給 AI 要求一次修復。</li>
+                        <li><strong>禁止無日誌裸奔：</strong> 程式內若出現 `except: pass` 吞掉錯誤，直接判定今日練習失敗。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 2. 練習內容（4 步驟明確產出） -->
+            <div class="bg-[#131924] border border-[#222D3F] rounded-2xl p-4 sm:p-5 space-y-3">
+                <h3 class="text-xs font-black uppercase tracking-wider text-[#5CD6D6]">2. 練習內容（4 個強制步驟與明確產出）</h3>
+                <div id="plan-steps-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div class="bg-[#0A0E14] border border-slate-800 rounded-xl p-3 space-y-1.5">
+                        <div class="flex items-center justify-between text-[11px] font-bold text-[#5CD6D6]">
+                            <span>STEP 01 (15m)</span>
+                            <span>規格與核心原型</span>
+                        </div>
+                        <p class="text-xs text-slate-200 font-semibold">餵入標準化 I/O 規格，讓 AI 一次生成可運行的單檔比對工具。</p>
+                        <div class="text-[11px] text-emerald-400 bg-emerald-950/30 px-2 py-1 rounded border border-emerald-800/40">
+                            產出：<code>audit_tool.py</code> (含 CLI 參數解析)
+                        </div>
+                    </div>
+                    <div class="bg-[#0A0E14] border border-slate-800 rounded-xl p-3 space-y-1.5">
+                        <div class="flex items-center justify-between text-[11px] font-bold text-[#5CD6D6]">
+                            <span>STEP 02 (15m)</span>
+                            <span>錯誤處理與結構化日誌</span>
+                        </div>
+                        <p class="text-xs text-slate-200 font-semibold">要求 AI 補齊缺漏欄位防呆、型別轉換防護與雙向 Rotating 日誌。</p>
+                        <div class="text-[11px] text-emerald-400 bg-emerald-950/30 px-2 py-1 rounded border border-emerald-800/40">
+                            產出：<code>logs/app.jsonl</code> 錯誤追蹤機制
+                        </div>
+                    </div>
+                    <div class="bg-[#0A0E14] border border-slate-800 rounded-xl p-3 space-y-1.5">
+                        <div class="flex items-center justify-between text-[11px] font-bold text-[#5CD6D6]">
+                            <span>STEP 03 (15m)</span>
+                            <span>自動測試與一鍵部署</span>
+                        </div>
+                        <p class="text-xs text-slate-200 font-semibold">用 AI 生成 5 組邊界測試（含負數、空值、亂碼）與一鍵啟動腳本。</p>
+                        <div class="text-[11px] text-emerald-400 bg-emerald-950/30 px-2 py-1 rounded border border-emerald-800/40">
+                            產出：<code>test_audit.py</code> + <code>deploy.sh</code>
+                        </div>
+                    </div>
+                    <div class="bg-[#0A0E14] border border-slate-800 rounded-xl p-3 space-y-1.5">
+                        <div class="flex items-center justify-between text-[11px] font-bold text-[#5CD6D6]">
+                            <span>STEP 04 (15m)</span>
+                            <span>每日自動狀態巡檢</span>
+                        </div>
+                        <p class="text-xs text-slate-200 font-semibold">建立定時 Heartbeat 檢查與異常告警腳本，確保無人值守穩定運行。</p>
+                        <div class="text-[11px] text-emerald-400 bg-emerald-950/30 px-2 py-1 rounded border border-emerald-800/40">
+                            產出：<code>daily_healthcheck.py</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. 完成後的自我檢查清單 & 5. 今日應留下的成果 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-[#131924] border border-[#222D3F] rounded-2xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-black uppercase tracking-wider text-[#5CD6D6]">4. 完成後的自我檢查清單（勾選連動進度）</h3>
+                        <span id="checklist-status" class="text-[11px] text-slate-400">已完成 1 / 4 項</span>
+                    </div>
+                    <div class="space-y-2" id="daily-checklist">
+                        <label class="flex items-start gap-2.5 p-2 rounded-lg bg-[#0A0E14] border border-slate-800 cursor-pointer hover:border-slate-600 transition">
+                            <input type="checkbox" checked class="chk-item mt-0.5 accent-[#5CD6D6] w-4 h-4 rounded">
+                            <span class="text-xs text-slate-200"><strong>60分鐘計時內完成：</strong> 沒有因為自己手寫修 Bug 而超時。</span>
+                        </label>
+                        <label class="flex items-start gap-2.5 p-2 rounded-lg bg-[#0A0E14] border border-slate-800 cursor-pointer hover:border-slate-600 transition">
+                            <input type="checkbox" class="chk-item mt-0.5 accent-[#5CD6D6] w-4 h-4 rounded">
+                            <span class="text-xs text-slate-200"><strong>髒數據壓力測試通過：</strong> 丟入缺漏欄位或金額異常的檔案時，系統會清楚報錯並寫入 Log，而非直接閃退。</span>
+                        </label>
+                        <label class="flex items-start gap-2.5 p-2 rounded-lg bg-[#0A0E14] border border-slate-800 cursor-pointer hover:border-slate-600 transition">
+                            <input type="checkbox" class="chk-item mt-0.5 accent-[#5CD6D6] w-4 h-4 rounded">
+                            <span class="text-xs text-slate-200"><strong>一鍵重現部署：</strong> 在全新資料夾執行單一指令即可跑完測試並啟動服務。</span>
+                        </label>
+                        <label class="flex items-start gap-2.5 p-2 rounded-lg bg-[#0A0E14] border border-slate-800 cursor-pointer hover:border-slate-600 transition">
+                            <input type="checkbox" class="chk-item mt-0.5 accent-[#5CD6D6] w-4 h-4 rounded">
+                            <span class="text-xs text-slate-200"><strong>商業變現掛鉤：</strong> 產出的報表格式可以直接拿給第 1 位潛在付費客戶看並詢問報價意願。</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="bg-[#131924] border border-[#222D3F] rounded-2xl p-4 space-y-3 flex flex-col justify-between">
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-black uppercase tracking-wider text-[#5CD6D6]">5. 今天結束後，你必須留下的 4 項硬成果</h3>
+                        <ul class="text-xs text-slate-300 space-y-2">
+                            <li class="flex items-center justify-between p-2 rounded bg-[#0A0E14] border border-slate-800">
+                                <span>① <strong>可執行資產檔：</strong> 單檔工具 + 自動測試腳本</span>
+                                <span class="text-[11px] font-mono text-[#5CD6D6]">audit_bundle.zip</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2 rounded bg-[#0A0E14] border border-slate-800">
+                                <span>② <strong>標準化 Prompt 模板：</strong> 驗證過一次成功的提示詞</span>
+                                <span class="text-[11px] font-mono text-[#5CD6D6]">prompt_v1.md</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2 rounded bg-[#0A0E14] border border-slate-800">
+                                <span>③ <strong>自動化巡檢日誌：</strong> 含耗時、Token 成本與狀態碼</span>
+                                <span class="text-[11px] font-mono text-[#5CD6D6]">health_report.json</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2 rounded bg-[#0A0E14] border border-slate-800">
+                                <span>④ <strong>商業驗證決策：</strong> 明日發送給 3 位同業測試的定價單</span>
+                                <span class="text-[11px] font-mono text-emerald-400">GO / NO-GO 決策</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <button onclick="switchTab('tab-60min')" class="w-full py-2.5 rounded-xl text-xs font-extrabold bg-[#1C2638] hover:bg-[#253249] text-[#5CD6D6] border border-[#5CD6D6]/30 transition">
+                        進入下一步：60 分鐘極速開發實戰 (含完整 Prompt 範本) →
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             MODULE 2: 【60 分鐘基礎能力特訓】
+             ========================================== -->
+        <section id="tab-60min" class="tab-panel hidden space-y-5">
+            <!-- Header & Timer -->
+            <div class="bg-[#131924] border border-[#222D3F] rounded-2xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-base font-extrabold text-white">60 分鐘基礎能力刻意練習（4 階段全閉環）</h2>
+                    <p class="text-xs text-slate-400">點擊下方 4 個能力階段，直接複製高精準 Prompt 範本，並對照你的低效習慣。</p>
+                </div>
+                <div class="flex items-center gap-3 bg-[#0A0E14] px-4 py-2 rounded-xl border border-slate-800">
+                    <div class="text-right">
+                        <div class="text-[10px] text-slate-400 uppercase font-bold">60分鐘倒數計時器</div>
+                        <div id="drill-timer-display" class="text-lg font-mono font-black text-[#5CD6D6]">60:00</div>
+                    </div>
+                    <button id="btn-timer-toggle" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#5CD6D6] text-slate-950 hover:bg-[#4bc2c2] transition">
+                        開始計時
+                    </button>
+                    <button id="btn-timer-reset" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
+                        重置
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4 Drill Selector Pills -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="drill-tabs">
+                <button data-drill="0" class="drill-btn bg-[#5CD6D6]/15 border border-[#5CD6D6] text-[#5CD6D6] p-3 rounded-xl text-left transition">
+                    <div class="text-[10px] font-extrabold uppercase">階段 01 (0-20m)</div>
+                    <div class="text-xs font-bold text-white mt-0.5">產出可運行小工具</div>
+                </button>
+                <button data-drill="1" class="drill-btn bg-[#131924] border border-slate-800 text-slate-400 hover:text-white p-3 rounded-xl text-left transition">
+                    <div class="text-[10px] font-extrabold uppercase">階段 02 (20-35m)</div>
+                    <div class="text-xs font-bold text-white mt-0.5">錯誤處理與日誌</div>
+                </button>
+                <button data-drill="2" class="drill-btn bg-[#131924] border border-slate-800 text-slate-400 hover:text-white p-3 rounded-xl text-left transition">
+                    <div class="text-[10px] font-extrabold uppercase">階段 03 (35-50m)</div>
+                    <div class="text-xs font-bold text-white mt-0.5">部署與測試流程</div>
+                </button>
+                <button data-drill="3" class="drill-btn bg-[#131924] border border-slate-800 text-slate-400 hover:text-white p-3 rounded-xl text-left transition">
+                    <div class="text-[10px] font-extrabold uppercase">階段 04 (50-60m)</div>
+                    <div class="text-xs font-bold text-white mt-0.5">每日自動狀態監控</div>
+                </button>
+            </div>
+
+            <!-- Active Drill Detail Box -->
+            <div class="bg-[#131924] border border-[#222D3F] rounded-2xl p-4 sm:p-5 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                        <span id="drill-stage-tag" class="text-[11px] font-bold text-[#5CD6D6] uppercase tracking-wider">STAGE 01 // 60分鐘內產出可運行小型工具</span>
+                        <h3 id="drill-title" class="text-base font-extrabold text-white mt-0.5">1. 用 AI 在 60 分鐘內產出可運行的小型工具（CLI 或簡單 Web）</h3>
+                    </div>
+                    <button id="btn-copy-drill-prompt" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#5CD6D6] text-slate-950 hover:bg-[#4bc2c2] transition flex items-center gap-1.5">
+                        <span>複製標準 Prompt 範本</span>
+                    </button>
+                </div>
+
+                <!-- Bad vs Good Comparison -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="bg-rose-950/25 border border-rose-800/50 rounded-xl p-4 space-y-2">
+                        <div class="text-xs font-black text-rose-400 uppercase flex items-center justify-between">
+                            <span>❌ 你常見的低效用法（浪費 40 分鐘來回修改）</span>
+                            <span class="text-[10px] bg-rose-900/60 px-2 py-0.5 rounded text-rose-200">嚴格禁止</span>
+                        </div>
+                        <p id="drill-bad-habit" class="text-xs text-slate-300 leading-relaxed"></p>
+                        <div class="bg-[#0A0E14] p-3 rounded-lg border border-rose-900/40 text-[11px] text-rose-300 font-mono" id="drill-bad-prompt"></div>
+                    </div>
+
+                    <div class="bg-emerald-950/25 border border-emerald-800/50 rounded-xl p-4 space-y-2">
+                        <div class="text-xs font-black text-emerald-400 uppercase flex items-center justify-between">
+                            <span>✅ 教練強制標準作法（一次到位、零廢話）</span>
+                            <span class="text-[10px] bg-emerald-900/60 px-2 py-0.5 rounded text-emerald-200">立即執行</span>
+                        </div>
+                        <p id="drill-good-rule" class="text-xs text-slate-300 leading-relaxed"></p>
+                        <div class="text-[11px] text-emerald-300 font-semibold" id="drill-deliverable"></div>
+                    </div>
+                </div>
+
+                <!-- Exact Copyable Prompt -->
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold text-slate-300">可直接複製執行的精準 Prompt 範本：</span>
+                        <span id="copy-toast" class="text-emerald-400 font-bold hidden">已複製到剪貼簿！</span>
+                    </div>
+                    <pre id="drill-prompt-box" class="bg-[#0A0E14] border border-slate-700 rounded-xl p-4 text-xs text-slate-200 overflow-x-auto leading-relaxed whitespace-pre-wrap"></pre>
+                </div>
+            </div>
+
+            <!-- Next Time 20% Faster Method -->
+            <div class="bg-gradient-to-br from-[#131924] to-[#0F1E29] border border-[#5CD6D6]/40 rounded-2xl p-4 sm:p-5 space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-black text-[#5CD6D6] uppercase tracking-wider">⚡ 結束總結：下一次再快 20%（從 60 分鐘縮短至 48 分鐘）的 3 個具體方法</h3>
+                    <span class="text-[11px] font-bold bg-[#5CD6D6]/20 text-[#5CD6D6] px-2.5 py-0.5 rounded-full">效率強制升級</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                    <div class="bg-[#0A0E14]/90 border border-slate-800 p-3.5 rounded-xl space-y-1">
+                        <div class="font-extrabold text-white">1. 建立個人 `Skeleton Boilerplate` 基底庫</div>
+                        <p class="text-slate-400 leading-relaxed">不要每次從零叫 AI 寫 `argparse`、`logging` 與 `pytest` 設定。把今天產出的錯誤日誌與測試框架存成 `base_template.py`，下次直接貼給 AI：「在此基底上只填入核心商業計算邏輯」，直接省下 8 分鐘。</p>
+                    </div>
+                    <div class="bg-[#0A0E14]/90 border border-slate-800 p-3.5 rounded-xl space-y-1">
+                        <div class="font-extrabold text-white">2. 先餵「真實髒數據樣本」再寫程式</div>
+                        <p class="text-slate-400 leading-relaxed">在第一個 Prompt 就附上 5 行真實 CSV（包含千分位逗號、空白格、文字混雜）。讓 AI 在寫第一版時就處理好轉型，省去後續來回 Debug 欄位型別的 5 分鐘。</p>
+                    </div>
+                    <div class="bg-[#0A0E14]/90 border border-slate-800 p-3.5 rounded-xl space-y-1">
+                        <div class="font-extrabold text-white">3. 合併「主程式 + 測試生成」為單一多段指令</div>
+                        <p class="text-slate-400 leading-relaxed">不要等主程式寫完才開第二輪對話要測試。在首輪 Prompt 直接要求輸出 `app.py` 與 `test_app.py` 兩個區塊並附帶單行執行指令 `pytest && python app.py`，省下等待與上下文切換的 4 分鐘。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             MODULE 3: 【可重複的軟體生產流水線】
+             ========================================== -->
+        <section id="tab-pipeline" class="tab-panel hidden space-y-5">
+            <div class="bg-[#131924] border border-[#222D3F] rounded-2xl p-4 sm:p-5 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                        <h2 class="text-base font-extrabold text-white">可重複的軟體生產流水線（AI 主導，你只做關鍵決策與最終確認）</h2>
+                        <p class="text-xs text-slate-400">從需求描述 → 架構設計 → 程式碼產生 → 測試 → 部署，建立標準化 SOP 與迭代成本帳本。</p>
+                    </div>
+                    <button id="btn-export-sop" class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-[#5CD6D6] text-slate-950 hover:bg-[#4bc2c2] transition">
+                        一鍵產生「流水線操作手冊初版」
+                    </button>
+                </div>
+
+                <!-- 1. 標準化的需求輸入格式 & 2. 自動拆解任務與排程 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="bg-[#0A0E14] border border-slate-800 rounded-xl p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-black text-[#5CD6D6] uppercase">1. 標準化需求輸入格式 (YAML Spec)</span>
+                            <button id="btn-run-decomposer" class="px-2.5 py-1 rounded text-[11px] font-bold bg-[#5CD6D6]/20 text-[#5CD6D6] border border-[#5CD6D6]/40 hover:bg-[#5CD6D6]/30 transition">
+                                讓 AI 自動拆解任務 →
+                            </button>
+                        </div>
+                        <textarea id="pipeline-spec-input" rows="9" class="w-full bg-[#131924] border border-slate-700 rounded-lg p-3 text-xs font-mono text-slate-200 focus:border-[#5CD6D6] focus:outline-none">project_name: 裝修工程報價與合約價差自動稽核器
+target_buyer: 室內裝修工地主任 / 中小型營造廠老闆
+pricing_goal: 單次檢測 NT$3,500 或 內部工具買斷 NT$18,000
+input_schema:
+  - contract_csv: [項次, 工項名稱, 單位, 合約數量, 合約單價, 合約複價]
+  - vendor_csv: [廠商代碼, 工項名稱, 實作數量, 廠商報價單價, 請款總額]
+core_rules:
+  - 自動比對相同工項之「結算價差」是否超過 NT$100,000
+  - 計算各分包項目是否符合「30% 毛利目標 (廠商成本 <= 70%)」
+output_artifact: 異常紅字標記 Excel 報表 + 執行摘要 JSON
+human_gate: 僅在「發現 >10萬價差」與「最終發送報表前」由人工簽核</textarea>
+                    </div>
+
+                    <div class="bg-[#0A0E14] border border-slate-800 rounded-xl p-4 space-y-3 flex flex-col justify-between">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-black text-[#5CD6D6] uppercase">2. AI 自動拆解任務與排程 + 3. 多步驟 Agent 鏈</span>
+                                <span class="text-[11px] text-emerald-400 font-bold">人工介入點：僅 2 處</span>
+                            </div>
+                            <div id="pipeline-decomposed-list" class="space-y-2 text-xs">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-[#131924] border border-slate-800 text-[11px] text-slate-300">
+                            <strong class="text-[#5CD6D6]">Agent 鏈減人工原則：</strong> Agent A (架構師) 輸出 <code>schema.json</code> → 自動觸發 Agent B (Coder) 產出代碼 → 自動觸發 Agent C (QA) 跑 <code>pytest</code>。若測試失敗，錯誤日誌直接回傳 Agent B 自動重寫（最多 3 次迴圈），<strong>期間完全禁止呼叫人類</strong>。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. 記錄每一次迭代的成本與時間 -->
+                <div class="bg-[#0A0E14] border border-slate-800 rounded-xl p-4 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <span class="text-xs font-black text-[#5CD6D6] uppercase">4. 迭代成本與時間追蹤表（找出拖慢交付的瓶頸）</span>
+                            <p class="text-[11px] text-slate-400">每次迭代必須記錄 AI 耗時、人工介入分鐘數與 API 成本。人工介入佔比 > 25% 的環節就是下週自動化對象。</p>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs">
+                            <span class="px-2.5 py-1 rounded bg-slate-800 text-slate-200">總耗時：<strong id="iter-total-time" class="text-[#5CD6D6]">49 分鐘</strong></span>
+                            <span class="px-2.5 py-1 rounded bg-slate-800 text-slate-200">人工佔比：<strong id="iter-human-ratio" class="text-amber-400">22.4%</strong></span>
+                            <span class="px-2.5 py-1 rounded bg-slate-800 text-slate-200">總 Token 成本：<strong id="iter-total-cost" class="text-emerald-400">US$ 0.42</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Add New Iteration Row -->
+                    <div class="grid grid-cols-2 sm:grid-cols-6 gap-2 pt-1">
+                        <input id="iter-version" type="text" placeholder="版本 (例 v1.3)" value="v1.3 報表匯出" class="bg-[#131924] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white">
+                        <input id="iter-ai-min" type="number" placeholder="AI 耗時(分)" value="8" class="bg-[#131924] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white">
+                        <input id="iter-human-min" type="number" placeholder="人工耗時(分)" value="2" class="bg-[#131924] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white">
+                        <input id="iter-cost" type="number" step="0.01" placeholder="API 成本($)" value="0.09" class="bg-[#131924] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white">
+                        <input id="iter-bottleneck" type="text" placeholder="瓶頸原因" value="手動調整 Excel 欄寬" class="bg-[#131924] border border-slate-700 rounded px-2.5 py-1.5 text-xs text-white">
+                        <button id="btn-add-iter" class="bg-[#5CD6D6] hover:bg-[#4bc2c2] text-slate-950 font-bold rounded px-3 py-1.5 text-xs transition">
+                            + 記錄迭代
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-slate-400">
+                                    <th class="py-2 px-2">迭代版本 / 模組</th>
+                                    <th class="py-2 px-2 text-right">AI 執行(分)</th>
+                                    <th class="py-2 px-2 text-right">人工介入(分)</th>
+                                    <th class="py-2 px-2 text-right">Token 成本(USD)</th>
+                                    <th class="py-2 px-2">主要瓶頸與教練優化指令</th>
+                                </tr>
+                            </thead>
+                            <tbody id="iter-table-body" class="divide-y divide-slate-800/60 text-slate-200">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Generated SOP Manual v1.0 -->
+                <div class="bg-[#0A0E14] border border-[#5CD6D6]/40 rounded-xl p-4 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-black text-[#5CD6D6] uppercase">📄 產出成果：《AI 軟體生產流水線操作手冊 初版 v1.0》</span>
+                        <button id="btn-copy-sop" class="px-2.5 py-1 rounded text-[11px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 transition">
+                            複製完整操作手冊 (.md)
+                        </button>
+                    </div>
+                    <pre id="pipeline-sop-preview" class="text-xs text-slate-300 bg-[#131924] p-3.5 rounded-lg border border-slate-800 overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-64"></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             MODULE 4: 【軟體上線後的自動化監控與優化】
+             ========================================== -->
+        <section id="tab-monitor" class="tab-panel hidden space-y-5">
+            <div class="bg-[#131924] border border-[#222D3F] rounded-2xl p-4 sm:p-5 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                        <h2 class="text-base font-extrabold text-white">軟體上線後的自動化監控、AI 診斷與省時成本計算</h2>
+                        <p class="text-xs text-slate-400">請提供真實或模擬的營運監控數據，教練將直接進行異常診斷、轉化迭代需求並核算實際省下的現金成本。</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="btn-sim-normal" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-700/50 hover:bg-emerald-900/60 transition">
+                            載入「穩定營運數據」
+                        </button>
+                        <button id="btn-sim-spike" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-rose-950/60 text-rose-300 border border-rose-700/50 hover:bg-rose-900/60 transition">
+                            模擬「廠商格式變動導致報錯飆升」
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 1. Telemetry & ROI Inputs -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <div class="bg-[#0A0E14] p-3 rounded-xl border border-slate-800">
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold">每日自動執行次數</label>
+                        <input id="mon-runs" type="number" value="45" class="mt-1 w-full bg-transparent text-base font-black text-white focus:outline-none border-b border-slate-700 focus:border-[#5CD6D6]">
+                    </div>
+                    <div class="bg-[#0A0E14] p-3 rounded-xl border border-slate-800">
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold">5xx / 轉型失敗率 (%)</label>
+                        <input id="mon-err-rate" type="number" step="0.1" value="6.8" class="mt-1 w-full bg-transparent text-base font-black text-rose-400 focus:outline-none border-b border-slate-700 focus:border-[#5CD6D6]">
+                    </div>
+                    <div class="bg-[#0A0E14] p-3 rounded-xl border border-slate-800">
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold">P95 回應延遲 (ms)</label>
+                        <input id="mon-latency" type="number" value="1850" class="mt-1 w-full bg-transparent text-base font-black text-amber-400 focus:outline-none border-b border-slate-700 focus:border-[#5CD6D6]">
+                    </div>
+                    <div class="bg-[#0A0E14] p-3 rounded-xl border border-slate-800">
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold">每次省下人工 (分鐘)</label>
+                        <input id="mon-saved-min" type="number" value="18" class="mt-1 w-full bg-transparent text-base font-black text-[#5CD6D6] focus:outline-none border-b border-slate-700 focus:border-[#5CD6D6]">
+                    </div>
+                    <div class="bg-[#0A0E14] p-3 rounded-xl border border-slate-800">
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold">你的時薪估值 (NT$)</label>
+                        <input id="mon-hourly-wage" type="number" value="1200" class="mt-1 w-full bg-transparent text-base font-black text-emerald-400 focus:outline-none border-b border-slate-700 focus:border-[#5CD6D6]">
+                    </div>
+                    <div class="bg-[#0A0E14] p-3 rounded-xl border border-slate-800">
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold">月度 API 雲端成本 (NT$)</label>
+                        <input id="mon-api-cost" type="number" value="650" class="mt-1 w-full bg-transparent text-base font-black text-slate-200 focus:outline-none border-b border-slate-700 focus:border-[#5CD6D6]">
+                    </div>
+                </div>
+
+                <!-- 4. ROI Calculation Output Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="bg-gradient-to-br from-[#0A0E14] to-[#122229] border border-[#5CD6D6]/40 rounded-xl p-4">
+                        <div class="text-[11px] text-slate-400 font-bold">每月實際省下工時</div>
+                        <div id="roi-hours-saved" class="text-2xl font-black text-[#5CD6D6] mt-1">405.0 小時 / 月</div>
+                        <div class="text-[11px] text-slate-400 mt-1">相當於省下 2.5 名全職行政助理</div>
+                    </div>
+                    <div class="bg-gradient-to-br from-[#0A0E14] to-[#11241E] border border-emerald-500/40 rounded-xl p-4">
+                        <div class="text-[11px] text-slate-400 font-bold">每月淨省下人力成本 (扣除 API)</div>
+                        <div id="roi-money-saved" class="text-2xl font-black text-emerald-400 mt-1">NT$ 485,350</div>
+                        <div class="text-[11px] text-slate-400 mt-1">公式：(月總省時 × 時薪) - 月 API 成本</div>
+                    </div>
+                    <div class="bg-[#0A0E14] border border-slate-800 rounded-xl p-4">
+                        <div class="text-[11px] text-slate-400 font-bold">監控告警狀態 (AI 判讀閾值)</div>
+                        <div id="roi-alert-badge" class="text-base font-black text-rose-400 mt-1">🚨 CRITICAL: 錯誤率 > 2.0% 觸發告警</div>
+                        <div id="roi-alert-desc" class="text-[11px] text-slate-300 mt-1">已自動阻斷異常批次並生成修復 Patch</div>
+                    </div>
+                </div>
+
+                <!-- Chart + AI Diagnosis & Next Iteration Backlog -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="bg-[#0A0E14] border border-slate-800 rounded-xl p-4 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-300">近 7 日自動化執行次數 vs. 錯誤率趨勢</span>
+                            <span class="text-[10px] text-slate-400">固定高度容器 (Chart.js)</span>
+                        </div>
+                        <div class="relative h-64">
+                            <canvas id="telemetryChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#0A0E14] border border-slate-800 rounded-xl p-4 space-y-3 flex flex-col justify-between">
+                        <div class="space-y-2">
+                            <span class="text-xs font-black text-[#5CD6D6] uppercase">2. AI 自動診斷與 3. 下一次迭代輸入轉換器</span>
+                            <label class="block text-[11px] text-slate-400">貼上今日錯誤日誌 / 用戶真實抱怨回饋：</label>
+                            <textarea id="mon-log-input" rows="3" class="w-full bg-[#131924] border border-slate-700 rounded-lg p-2.5 text-xs font-mono text-rose-300 focus:border-[#5CD6D6] focus:outline-none">{"ts":"2026-11-13T09:42:11Z","level":"ERROR","code":"ERR_UNIT_MISMATCH","msg":"ValueError: could not convert string to float: '1,250,000(含稅)' in vendor_quote_育成高中.csv","user_feedback":"廠商傳來的報價單常常在金額後面自己加括號寫(含稅)或(未稅)，程式每次遇到這種就直接當掉！"}</textarea>
+                            <button id="btn-diagnose-log" class="w-full py-2 rounded-lg text-xs font-extrabold bg-[#5CD6D6] text-slate-950 hover:bg-[#4bc2c2] transition">
+                                執行 AI 根因診斷 → 產生修復建議與下一版迭代規格
+                            </button>
+                        </div>
+                        <div id="mon-diagnosis-output" class="bg-[#131924] border border-slate-700 rounded-lg p-3 text-xs text-slate-200 space-y-1.5">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             MODULE 5: 【每日強制檢討】
+             ========================================== -->
+        <section id="tab-audit" class="tab-panel hidden space-y-5">
+            <div class="bg-[#131924] border border-[#222D3F] rounded-2xl p-4 sm:p-5 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                        <h2 class="text-base font-extrabold text-white">【每日強制檢討】冷酷但正確的教練評語</h2>
+                        <p class="text-xs text-slate-400">輸入你今天實際做的事情與寫過的低效 Prompt，教練將無情拆解你的偷懶與假忙行為。</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="btn-audit-sample-bad" class="px-2.5 py-1 rounded text-[11px] bg-rose-950/60 text-rose-300 border border-rose-700/50">
+                            範例：今天都在手動調格式 (低貢獻)
+                        </button>
+                        <button id="btn-audit-sample-good" class="px-2.5 py-1 rounded text-[11px] bg-emerald-950/60 text-emerald-300 border border-emerald-700/50">
+                            範例：完成標單自動比對並發給3位客戶 (高貢獻)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1">你今天實際做了哪些事？（誠實列出手動做的部分）</label>
+                        <textarea id="audit-actions" rows="3" class="w-full bg-[#0A0E14] border border-slate-700 rounded-lg p-3 text-xs text-white focus:border-[#5CD6D6] focus:outline-none">今天用 AI 寫了一個比對廠商請款跟合約金額的 Python 腳本，但因為廠商的 Excel 欄位名稱不一樣，我花了一小時自己手動打開 8 個 Excel 檔把欄位名稱改統一，還自己用肉眼檢查哪幾筆金額差超過 10 萬。</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1">你今天寫過最慢、最卡的一句 Prompt 是什麼？</label>
+                        <textarea id="audit-raw-prompt" rows="3" class="w-full bg-[#0A0E14] border border-slate-700 rounded-lg p-3 text-xs text-white focus:border-[#5CD6D6] focus:outline-none">幫我寫一個可以比對兩個 Excel 報價單的 Python 程式，如果金額不一樣就標出來，要寫得清楚一點。</textarea>
+                    </div>
+                </div>
+
+                <button id="btn-run-audit" class="w-full py-2.5 rounded-xl text-xs font-extrabold bg-rose-500 hover:bg-rose-600 text-white transition shadow-lg">
+                    生成 5 大強制檢討冷酷評語
+                </button>
+
+                <!-- 5 Mandatory Review Outputs -->
+                <div id="audit-results-container" class="space-y-3 pt-2">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             MODULE 6: 【每週商業對齊檢討】
+             ========================================== -->
+        <section id="tab-weekly" class="tab-panel hidden space-y-5">
+            <div class="bg-[#131924] border border-[#222D3F] rounded-2xl p-4 sm:p-5 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                        <h2 class="text-base font-extrabold text-white">【每週商業對齊檢討】以「能否賺錢」為唯一評價標準</h2>
+                        <p class="text-xs text-slate-400">檢視過去 7 天練習成果，盤點已自動化與仍依賴你本人的環節，鎖定最快創造第一筆現金流的變現路徑。</p>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                        唯一標準：能否收到真實客戶的錢
+                    </span>
+                </div>
+
+                <!-- 1 & 2: Interactive Ring Check -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-[#0A0E14] border border-slate-800 rounded-xl p-4 space-y-2.5">
+                        <h3 class="text-xs font-black text-emerald-400 uppercase">1. 目前已經能穩定自動化的環節（勾選現況）</h3>
+                        <div class="space-y-2 text-xs text-slate-200" id="weekly-auto-list">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" checked class="weekly-chk accent-emerald-400">
+                                <span>單一工項/廠商報價 CSV 與 Excel 結構化解析與清洗</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" checked class="weekly-chk accent-emerald-400">
+                                <span>價差 >10 萬與毛利 <30% (成本>70%) 自動紅字標記腳本</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" checked class="weekly-chk accent-emerald-400">
+                                <span>基礎 Pytest 邊界測試與每日定時 Healthcheck 狀態巡檢</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#0A0E14] border border-slate-800 rounded-xl p-4 space-y-2.5">
+                        <h3 class="text-xs font-black text-rose-400 uppercase">2. 仍然高度依賴你本人的環節（現金流卡點）</h3>
+                        <div class="space-y-2 text-xs text-slate-200">
+                            <div class="p-2 rounded bg-rose-950/30 border border-rose-800/40">
+                                <strong>卡點 A（非標準格式對齊）：</strong> 各家協力廠商（水電、木作、泥作）傳來的報價單欄位命名混亂，仍需人工確認映射關係。
+                            </div>
+                            <div class="p-2 rounded bg-rose-950/30 border border-rose-800/40">
+                                <strong>卡點 B（報價與收款閉環）：</strong> 工具跑出結果後，還沒有「自動生成客戶體驗連結 + LINE Pay/轉帳收款開通權限」的自助流程。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. 創造第一筆現金流最現實的 3 個具體路徑 -->
+                <div class="space-y-2.5">
+                    <h3 class="text-xs font-black text-[#5CD6D6] uppercase">3. 用目前能力創造「第一筆現金流」最現實的 3 個具體選項（點選展開執行劇本）</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3" id="cashflow-paths">
+                        <div class="bg-[#0A0E14] border-2 border-[#5CD6D6] rounded-xl p-4 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-black bg-[#5CD6D6] text-slate-950 px-2 py-0.5 rounded">路徑 A // 最快 48 小時收錢</span>
+                                <span class="text-xs font-black text-emerald-400">NT$ 3,500 / 案</span>
+                            </div>
+                            <h4 class="text-sm font-extrabold text-white">同行「標單排雷與結算價差代審」閃電服務</h4>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                不用等 SaaS 網站做好。直接私訊 5 位熟識的室內裝修/營造同行：「把你手邊正在對帳的廠商請款單與合約傳給我，我用 AI 系統 30 分鐘內幫你抓出溢報、重複計價與毛利低於 30% 的工項，抓不到不收錢，抓到一案收 3,500 元。」
+                            </p>
+                        </div>
+
+                        <div class="bg-[#0A0E14] border border-slate-800 rounded-xl p-4 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-black bg-slate-800 text-slate-300 px-2 py-0.5 rounded">路徑 B // 高單價買斷</span>
+                                <span class="text-xs font-black text-emerald-400">NT$ 15,000 / 套</span>
+                            </div>
+                            <h4 class="text-sm font-extrabold text-white">離線版 Windows 裝修成本與請款核對工具包</h4>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                針對討厭資料上雲端的中小型工程行，將你的 Python + CustomTkinter 工具打包成單一 `.exe` 離線桌面軟體，內建「至少 3 家廠商比價防呆」與「自動攤提發票金額」功能，一次買斷含 1 小時教學收 NT$ 15,000。
+                            </p>
+                        </div>
+
+                        <div class="bg-[#0A0E14] border border-slate-800 rounded-xl p-4 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-black bg-slate-800 text-slate-300 px-2 py-0.5 rounded">路徑 C // 每月穩定訂閱</span>
+                                <span class="text-xs font-black text-emerald-400">NT$ 1,280 / 月</span>
+                            </div>
+                            <h4 class="text-sm font-extrabold text-white">AI 智慧工程標單與公共工程文件查核月租版</h4>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                將工具放上簡單 Web 介面，提供「上傳 Excel 自動產出異常紅字報表 + 缺失查核表」，前 2 次免費試用，第 3 次起綁定 LINE Pay 每月自動扣款 NT$ 1,280，只要 25 個同行訂戶就能創造每月 3.2 萬被動現金流。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4 & 5: Next 14 Days Priority & Next Week Top 3 Focus -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-[#0A0E14] border border-amber-500/40 rounded-xl p-4 space-y-2">
+                        <h3 class="text-xs font-black text-amber-400 uppercase">4. 接下來 14 天最該優先補強的 1 項核心能力</h3>
+                        <div class="text-sm font-extrabold text-white">「非結構化髒數據的 AI 語意自動對齊 (Schema Mapping) + 收款閉環」</div>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            你現在最大的時間黑洞不是寫主程式，而是「不同廠商給的 Excel 格式長得不一樣，你要手動改表頭」。接下來 14 天，專攻用 LLM JSON Mode 自動識別任意報價單的表頭並轉成標準欄位，把人工整理數據的時間從 30 分鐘壓到 0 秒。
+                        </p>
+                    </div>
+
+                    <div class="bg-[#0A0E14] border border-[#5CD6D6]/40 rounded-xl p-4 space-y-2">
+                        <h3 class="text-xs font-black text-[#5CD6D6] uppercase">5. 下週練習重點（嚴格限制最多 3 項）</h3>
+                        <ol class="text-xs text-slate-200 space-y-2 list-decimal pl-4">
+                            <li><strong>【技術消滅人工】</strong> 完成「任意廠商報價單表頭 AI 自動對齊模組」，測試 5 份不同格式的真實工地報價單，達成 100% 免手改表頭。</li>
+                            <li><strong>【產品封裝交付】</strong> 將輸出報表加上「公司專屬浮水印 + 異常價差超過 10 萬自動標紅」的一鍵匯出功能。</li>
+                            <li><strong>【強制商業驗證】</strong> 拿這套系統幫 3 位真實同業免費跑一次舊案對帳，展示抓出的價差金額，當場向其中至少 1 人提出 NT$ 3,500 代審或月租報價。</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal 1: 教練 5 大鐵則 -->
+    <div id="modal-rules" class="fixed inset-0 z-50 bg-black/80 ios-blur hidden items-center justify-center p-4">
+        <div class="bg-[#131924] border border-[#5CD6D6]/50 rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-base font-extrabold text-white">⚠️ AI 商業與自動化教練 — 5 大鐵則</h3>
+                <button id="btn-close-rules" class="text-slate-400 hover:text-white text-sm font-bold px-2 py-1">✕</button>
+            </div>
+            <ol class="text-xs text-slate-200 space-y-2.5 list-decimal pl-4 leading-relaxed">
+                <li><strong>不講勵志、不灌雞湯、不給空洞建議：</strong> 聽不懂什麼叫「慢慢來、持續努力」，只看今天有沒有跑通可交付的程式碼與現金流閉環。</li>
+                <li><strong>每次必含「可立即執行的步驟」與「明確的成功標準」：</strong> 沒有時限、沒有檔案名稱、沒有測試指標的計畫一律視為廢話。</li>
+                <li><strong>模糊與理想化直接退件：</strong> 只要你說「想做一個全自動賺錢 AI」，立刻打回票，強制改為具體的目標客群、輸入格式與收費單價。</li>
+                <li><strong>優先考慮實際可行商業模式：</strong> 專注於垂直工具型產品、內部工具轉售、自動化代工服務與微型 SaaS。</li>
+                <li><strong>核心目標唯一：</strong> 降低人力成本、提高交付速度、建立可重複的自動化流程。</li>
+            </ol>
+            <button id="btn-ack-rules" class="w-full py-2.5 rounded-xl text-xs font-extrabold bg-[#5CD6D6] text-slate-950">
+                我已清楚規則，回到刻意練習
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal 2: iPhone 安裝與 App Store 上架打包中心 -->
+    <div id="modal-ios" class="fixed inset-0 z-50 bg-black/80 ios-blur hidden items-center justify-center p-4">
+        <div class="bg-[#131924] border border-[#5CD6D6]/50 rounded-2xl max-w-2xl w-full p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div>
+                    <h3 class="text-base font-extrabold text-white">📱 iPhone 實機安裝與 App Store 上架配置包</h3>
+                    <p class="text-xs text-slate-400">立即在你的 iPhone 17 全螢幕運行測試版，或封裝至 Xcode 提交 App Store Connect。</p>
+                </div>
+                <button id="btn-close-ios" class="text-slate-400 hover:text-white text-sm font-bold px-2 py-1">✕</button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div class="bg-[#0A0E14] border border-slate-800 rounded-xl p-3.5 space-y-1.5">
+                    <div class="font-extrabold text-[#5CD6D6]">方式 A：30 秒裝進 iPhone 17 主畫面 (PWA 測試版)</div>
+                    <ol class="list-decimal pl-4 space-y-1 text-slate-300 leading-relaxed">
+                        <li>在 iPhone Safari 開啟本應用檔案。</li>
+                        <li>點擊底部中間的「分享」圖示 (方框向上箭頭)。</li>
+                        <li>點選<strong>「加入主畫面 (Add to Home Screen)」</strong>。</li>
+                        <li>從桌面點擊圖示啟動，即享無網址列全螢幕原生體驗與離線儲存。</li>
+                    </ol>
+                </div>
+                <div class="bg-[#0A0E14] border border-slate-800 rounded-xl p-3.5 space-y-1.5">
+                    <div class="font-extrabold text-emerald-400">方式 B：Capacitor / SwiftUI 封裝上架 App Store</div>
+                    <ol class="list-decimal pl-4 space-y-1 text-slate-300 leading-relaxed">
+                        <li>執行下方一鍵指令建立 iOS WebView 原生殼。</li>
+                        <li>設定 Bundle ID：<code>com.huiqiang.aicoach</code>。</li>
+                        <li>內建符合 Apple 審核 Guidelines 4.2 的離線持久化與動態圖表功能。</li>
+                        <li>透過 Xcode Archive 上傳至 TestFlight 即可邀請外部測試。</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-xs">
+                    <span class="font-bold text-slate-300">Xcode / Capacitor 一鍵轉換為 App Store 專案腳本：</span>
+                    <button id="btn-copy-ios-script" class="px-2.5 py-1 rounded bg-[#5CD6D6] text-slate-950 font-bold text-[11px]">複製上架腳本</button>
+                </div>
+                <pre id="ios-script-box" class="bg-[#0A0E14] border border-slate-800 rounded-xl p-3 text-[11px] font-mono text-slate-200 overflow-x-auto leading-relaxed"># 1. 初始化 Capacitor iOS 專案並注入本單檔應用
+mkdir -p ai-biz-coach-ios/www && cp ai_business_coach_ios.html ai-biz-coach-ios/www/index.html
+cd ai-biz-coach-ios && npm init -y
+npm install @capacitor/core @capacitor/cli @capacitor/ios
+npx cap init "AI商業教練" "com.huiqiang.aicoach" --web-dir www
+npx cap add ios && npx cap open ios
+# 2. 於 Xcode 選擇 Team 簽章 -> Product > Archive -> Distribute to App Store Connect (TestFlight)</pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. Tab Navigation Logic
+        // ==========================================
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.add('hidden');
+            });
+            const target = document.getElementById(tabId);
+            if (target) target.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.getAttribute('data-tab') === tabId) {
+                    btn.className = 'nav-btn nav-pill-active px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition flex items-center gap-1.5';
+                } else {
+                    btn.className = 'nav-btn px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white bg-[#131924] border border-transparent whitespace-nowrap transition flex items-center gap-1.5';
+                }
+            });
+
+            if (tabId === 'tab-monitor') {
+                setTimeout(() => {
+                    initOrUpdateChart();
+                }, 60);
+            }
+        }
+
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                switchTab(btn.getAttribute('data-tab'));
+            });
+        });
+
+        // ==========================================
+        // 2. Module 1: Daily Practice & Strict Validator
+        // ==========================================
+        const critiqueBox = document.getElementById('daily-critique-box');
+        const resInput = document.getElementById('daily-resources');
+        const levelInput = document.getElementById('daily-level');
+        const bizInput = document.getElementById('daily-biz-model');
+        const planGoal = document.getElementById('plan-goal');
+
+        document.getElementById('btn-preset-vague').addEventListener('click', () => {
+            resInput.value = '我想用 AI 做一個全自動賺錢的軟體，每天不用管它就會自己進帳，目前沒什麼想法。';
+            runDailyCoachValidation();
+        });
+
+        document.getElementById('btn-preset-solid').addEventListener('click', () => {
+            resInput.value = '每日可投入 90 分鐘；具備 Python、CustomTkinter、Streamlit、Excel 自動化與室內裝修標單排雷實戰經驗；手上有裝修工程同行與協力廠商名單；目標毛利率 30%（廠商成本上限 70%）。';
+            runDailyCoachValidation();
+        });
+
+        function runDailyCoachValidation() {
+            const text = resInput.value.trim();
+            const level = levelInput.value;
+            const biz = bizInput.value;
+            const isVague = text.length < 25 || text.includes('沒什麼想法') || text.includes('全自動賺錢') || text.includes('不知道');
+
+            if (isVague) {
+                critiqueBox.className = 'flex-1 text-xs px-3 py-2 rounded-lg bg-rose-950/60 border border-rose-600 text-rose-200';
+                critiqueBox.innerHTML = '<strong class="text-rose-400">【教練嚴格退件 — 違反規則 3 & 4】</strong> 你的描述太模糊、太理想化！世上沒有「不用管就會自己進帳的空想 AI」。立刻修正為：(1) 你每天能拿出的具體分鐘數、(2) 你現有的產業經驗或腳本、(3) 願意付錢買單的具體客群。';
+                planGoal.innerHTML = '⚠️ <span class="text-rose-400">已暫停排程：請先在上方誠實填寫「具體時間、技能、現有客群」，修正空想心態後再次點擊執行。</span>';
+            } else {
+                critiqueBox.className = 'flex-1 text-xs px-3 py-2 rounded-lg bg-emerald-950/40 border border-emerald-700/40 text-emerald-200';
+                critiqueBox.innerHTML = `<strong class="text-emerald-400">【教練診斷通過 // ${level}・${biz}】</strong> 資源盤點具體。鎖定「降低人力核對成本、提高報表交付速度」，今日禁止寫任何花俏新功能，專注把核心比對工具跑通並加上錯誤日誌與自動監控。`;
+                planGoal.innerHTML = `在 60 分鐘內，針對「${biz}」場景，用 AI 將核心數據處理封裝成可獨立執行的 CLI/Web 工具，輸入真實測試檔案後 3 秒內標出異常價差與毛利缺口，並具備完整 JSONL 日誌與一鍵測試腳本。`;
+            }
+        }
+
+        document.getElementById('btn-generate-daily').addEventListener('click', runDailyCoachValidation);
+
+        // Checklist Progress Sync
+        function updateChecklistProgress() {
+            const checks = document.querySelectorAll('.chk-item');
+            let done = 0;
+            checks.forEach(c => { if (c.checked) done++; });
+            const pct = Math.round((done / checks.length) * 100);
+            document.getElementById('checklist-status').textContent = `已完成 ${done} / ${checks.length} 項`;
+            document.getElementById('global-progress-text').textContent = `${pct}% (${done}/${checks.length})`;
+            document.getElementById('global-progress-bar').style.width = `${pct}%`;
+        }
+        document.querySelectorAll('.chk-item').forEach(c => {
+            c.addEventListener('change', updateChecklistProgress);
+        });
+
+        // ==========================================
+        // 3. Module 2: 60-Minute Drill Data & Timer
+        // ==========================================
+        const drillsData = [
+            {
+                stage: 'STAGE 01 // 00:00 - 20:00 (20分鐘)',
+                title: '1. 用 AI 在 60 分鐘內產出一個可運行的小型工具（CLI 或簡單 Web）',
+                badHabit: '只給一句模糊口號，不給輸入輸出欄位定義（Schema），也不限制技術棧，結果 AI 吐出需要安裝 10 個套件、還缺環境變數的半成品，光處理套件衝突就耗掉 35 分鐘。',
+                badPrompt: '「幫我寫一個可以自動核對廠商報價單和工程標單的程式，要有網頁介面。」',
+                goodRule: '強制在第一句話定義「單一檔案、零外部資料庫、明確 CSV 輸入欄位、明確數值計算公式、以及 CLI 執行範例」。',
+                deliverable: '明確產出：單檔 quote_auditor.py，執行 python quote_auditor.py --contract c.csv --vendor v.csv 即可在 2 秒內輸出 audit_result.json。',
+                prompt: `你是一位資深 Python 自動化架構師。請幫我寫一個「單一檔案、可直接運行」的工程報價價差稽核 CLI 工具 (quote_auditor.py)。
+
+【嚴格約束】
+1. 僅使用 Python 標準庫 (csv, json, argparse, pathlib, typing)，禁止依賴外部未安裝套件。
+2. 輸入參數：--contract (合約標單 CSV 路徑) 與 --vendor (廠商請款 CSV 路徑) 與 --out (輸出 JSON 路徑)。
+3. 輸入欄位格式：item_code (工項代碼), item_name (名稱), contract_amount (合約金額), vendor_amount (廠商請款金額)。
+4. 核心商業邏輯：
+   - 依 item_code 對齊兩份檔案
+   - 計算 diff = vendor_amount - contract_amount
+   - 計算 margin_rate = (contract_amount - vendor_amount) / contract_amount
+   - 若 abs(diff) >= 100000 或 margin_rate < 0.30，標記 status = "ALERT_HIGH_RISK"
+5. 請同時輸出一段可產生 5 筆測試 CSV 數據的初始化參數 (--init-sample)，讓我複製後 10 秒內就能直接跑通驗證。`
+            },
+            {
+                stage: 'STAGE 02 // 20:00 - 35:00 (15分鐘)',
+                title: '2. 用 AI 把這個工具加上基本錯誤處理與結構化日誌',
+                badHabit: '完全不加防呆，或是讓 AI 寫出 except Exception: pass 把錯誤吞掉；等到客戶傳來帶有「$1,200,000(含稅)」或空行的 CSV 時，程式直接崩潰且找不到哪一行出錯。',
+                badPrompt: '「幫我把剛剛的程式加上 try except 不要讓它當機，還有加一點 log。」',
+                goodRule: '強制定義「錯誤分類碼 (Error Code)」、「髒數據清洗規則」、「JSONL 結構化日誌格式」以及「遇到單行壞數據時跳過並記錄行號，不中斷整批任務」。',
+                deliverable: '明確產出：具備 logs/audit.jsonl 結構化日誌與壞數據隔離報告 failed_rows.json 的強化版程式。',
+                prompt: `請將剛剛的 quote_auditor.py 升級，加入「生產級錯誤處理與 JSONL 結構化日誌」。
+
+【嚴格要求】
+1. 禁止使用裸露的 except: pass。必須定義明確的自訂例外類別：SchemaMismatchError (缺少必要欄位)、RowParseError (數值轉換失敗)。
+2. 數值清洗防呆：金額欄位若包含「$」、「,」、「(含稅)」、「空白」，請自動清洗並轉換為 float；若仍無法轉換，將該行寫入 failed_rows 陣列並記錄行號，繼續處理下一行，不可整支程式崩潰。
+3. 結構化日誌：建立 JSONL Logger 寫入 logs/audit.jsonl，每筆日誌必含欄位：
+   {"timestamp": "ISO8601", "level": "INFO|WARN|ERROR", "event": "事件名稱", "duration_ms": 耗時, "error_code": "錯誤碼或null", "detail": {}}
+4. 程式結束時，請依照狀態回傳明確的系統 Exit Code (0=全數正常, 1=部分資料列異常, 2=致命檔案讀取失敗)。`
+            },
+            {
+                stage: 'STAGE 03 // 35:00 - 50:00 (15分鐘)',
+                title: '3. 用 AI 寫出可重複執行的部署與自動化測試流程',
+                badHabit: '每次改完程式碼都自己手動打開終端機打指令、手動打開輸出的 Excel 肉眼看數字對不對。改 5 次就浪費 25 分鐘在做重複的人力驗收。',
+                badPrompt: '「幫我測試一下這個程式有沒有 bug。」',
+                goodRule: '要求 AI 一次產出「涵蓋正常與 4 種極端邊界情況的单元测试檔」加上「一鍵驗收部署腳本 (run_pipeline.sh)」，測試沒過自動阻斷部署。',
+                deliverable: '明確產出：test_quote_auditor.py + run_pipeline.sh（執行單一指令即完成環境檢查、5 組自動化測試與打包）。',
+                prompt: `請為 quote_auditor.py 撰寫完整的自動化測試套件 (test_quote_auditor.py) 與一鍵測試部署腳本 (run_pipeline.sh)。
+
+【測試案例要求 (使用 unittest 或 pytest)】
+1. test_normal_matching：正常對齊且計算出正確毛利率。
+2. test_discrepancy_over_100k：價差超過 100,000 時必須觸發 ALERT_HIGH_RISK。
+3. test_dirty_currency_strings：金額含有 "$1,250,000(未稅)" 時能正確解析為 1250000.0。
+4. test_missing_columns：當輸入 CSV 缺少 item_code 欄位時，必須拋出 SchemaMismatchError 並回傳 Exit Code 2。
+5. test_zero_contract_amount：合約金額為 0 時不可發生 ZeroDivisionError。
+
+【一鍵腳本 run_pipeline.sh 要求】
+開啟 set -euo pipefail，依序執行：語法檢查 -> 執行全部單元測試 -> 執行 --init-sample 煙霧測試 -> 驗證 logs/audit.jsonl 是否成功生成 -> 輸出 "PIPELINE_PASS" 標記。`
+            },
+            {
+                stage: 'STAGE 04 // 50:00 - 60:00 (10分鐘)',
+                title: '4. 用 AI 建立一個「每天自動檢查狀態」的簡單監控機制',
+                badHabit: '工具上線或排程跑了之後就不管它，直到兩個禮拜後客戶抱怨「怎麼都沒收到報表」，才發現排程早就因為磁碟滿或格式變動卡死了。',
+                badPrompt: '「怎麼知道我的程式每天有沒有正常跑？」',
+                goodRule: '建立獨立的 daily_healthcheck.py，每天定時掃描 logs/audit.jsonl 的最後執行時間、錯誤率與耗時，並輸出 AI 與人類都能秒懂的告警摘要與 Webhook 通知。',
+                deliverable: '明確產出：daily_healthcheck.py + Crontab / Windows 工作排程器一鍵註冊指令。',
+                prompt: `請幫我寫一個「每日自動巡檢與告警腳本」 (daily_healthcheck.py)，用來監控 quote_auditor.py 的健康狀態。
+
+【監控指標與告警條件】
+1. 讀取 logs/audit.jsonl 最近 24 小時的記錄：
+   - 死寂告警 (STALE_RUN)：若最近 24 小時內無任何成功執行紀錄，狀態設為 CRITICAL。
+   - 錯誤率告警 (HIGH_ERROR_RATE)：若 ERROR 次數佔總執行次數 > 5%，狀態設為 WARNING。
+   - 效能退化 (SLOW_EXECUTION)：若平均 duration_ms > 3000ms，狀態設為 WARNING。
+2. 輸出格式：產出 health_status.json，包含 status ("HEALTHY"|"WARNING"|"CRITICAL")、metrics 統計數據、以及給 AI 診斷用的 last_3_errors 摘要。
+3. 若狀態非 HEALTHY，自動呼叫 send_alert(payload) 函式（支援 LINE Notify / Discord / Telegram Webhook URL，並提供本地模擬印出模式）。
+4. 請附上在 macOS/Linux (crontab) 與 Windows (schtasks) 設定每天早上 08:30 自動執行的單行指令。`
+            }
+        ];
+
+        let currentDrillIdx = 0;
+        function renderDrill(idx) {
+            currentDrillIdx = idx;
+            const d = drillsData[idx];
+            document.getElementById('drill-stage-tag').textContent = d.stage;
+            document.getElementById('drill-title').textContent = d.title;
+            document.getElementById('drill-bad-habit').textContent = d.badHabit;
+            document.getElementById('drill-bad-prompt').textContent = d.badPrompt;
+            document.getElementById('drill-good-rule').textContent = d.goodRule;
+            document.getElementById('drill-deliverable').textContent = d.deliverable;
+            document.getElementById('drill-prompt-box').textContent = d.prompt;
+
+            document.querySelectorAll('.drill-btn').forEach((btn, i) => {
+                if (i === idx) {
+                    btn.className = 'drill-btn bg-[#5CD6D6]/15 border border-[#5CD6D6] text-[#5CD6D6] p-3 rounded-xl text-left transition';
+                } else {
+                    btn.className = 'drill-btn bg-[#131924] border border-slate-800 text-slate-400 hover:text-white p-3 rounded-xl text-left transition';
+                }
+            });
+        }
+
+        document.querySelectorAll('.drill-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                renderDrill(parseInt(btn.getAttribute('data-drill'), 10));
+            });
+        });
+
+        function copyTextSafe(text, toastEl) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+            } else {
+                fallbackCopy(text);
+            }
+            if (toastEl) {
+                toastEl.classList.remove('hidden');
+                setTimeout(() => toastEl.classList.add('hidden'), 2000);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); } catch (e) {}
+            document.body.removeChild(ta);
+        }
+
+        document.getElementById('btn-copy-drill-prompt').addEventListener('click', () => {
+            copyTextSafe(drillsData[currentDrillIdx].prompt, document.getElementById('copy-toast'));
+        });
+
+        // 60-Min Timer
+        let timerSeconds = 3600;
+        let timerInterval = null;
+        const timerDisplay = document.getElementById('drill-timer-display');
+        const timerToggleBtn = document.getElementById('btn-timer-toggle');
+
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60).toString().padStart(2, '0');
+            const s = (sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        timerToggleBtn.addEventListener('click', () => {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                timerToggleBtn.textContent = '繼續計時';
+            } else {
+                timerToggleBtn.textContent = '暫停';
+                timerInterval = setInterval(() => {
+                    if (timerSeconds > 0) {
+                        timerSeconds--;
+                        timerDisplay.textContent = formatTime(timerSeconds);
+                    } else {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        timerToggleBtn.textContent = '時間到';
+                    }
+                }, 1000);
+            }
+        });
+
+        document.getElementById('btn-timer-reset').addEventListener('click', () => {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = null;
+            timerSeconds = 3600;
+            timerDisplay.textContent = '60:00';
+            timerToggleBtn.textContent = '開始計時';
+        });
+
+        // ==========================================
+        // 4. Module 3: Software Production Pipeline
+        // ==========================================
+        const iterations = [
+            { ver: 'v1.0 核心比對原型', aiMin: 12, humanMin: 5, cost: 0.14, note: '手動對齊兩份 CSV 表頭 → 改由 Schema Agent 自動映射' },
+            { ver: 'v1.1 錯誤處理與日誌', aiMin: 9, humanMin: 3, cost: 0.11, note: '金額含括號文字報錯 → 加入正則清洗規則庫' },
+            { ver: 'v1.2 自動測試與排程', aiMin: 17, humanMin: 3, cost: 0.17, note: 'Windows 路徑斜線差異 → 強制改用 pathlib.Path' }
+        ];
+
+        function renderPipelineDecomposer() {
+            const specText = document.getElementById('pipeline-spec-input').value;
+            const firstLine = specText.split('\n')[0].replace('project_name:', '').trim() || '自動化軟體專案';
+            const listEl = document.getElementById('pipeline-decomposed-list');
+            const stages = [
+                { step: 'Stage 1 // 架構與 Schema 鎖定', role: 'AI Architect Agent', time: '5 分鐘', gate: '自動驗證 JSON Schema', status: 'AUTO' },
+                { step: `Stage 2 // 「${firstLine}」主程式生成`, role: 'AI Coder Agent', time: '12 分鐘', gate: '關鍵決策 1：人工確認商業毛利公式 (2分鐘)', status: 'GATE' },
+                { step: 'Stage 3 // 邊界單元測試與自動修復迴圈', role: 'AI QA Agent (最多3次重試)', time: '10 分鐘', gate: 'Pytest 100% 通過自動放行', status: 'AUTO' },
+                { step: 'Stage 4 // 部署打包與每日監控掛載', role: 'AI DevOps Agent', time: '5 分鐘', gate: '關鍵決策 2：最終驗收簽核上線 (2分鐘)', status: 'GATE' }
+            ];
+            listEl.innerHTML = stages.map(s => `
+                <div class="p-2.5 rounded-lg bg-[#131924] border ${s.status === 'GATE' ? 'border-amber-500/40' : 'border-slate-800'} flex items-center justify-between gap-2">
+                    <div>
+                        <div class="font-bold text-white">${s.step} <span class="text-[10px] text-[#5CD6D6] ml-1">[${s.role}]</span></div>
+                        <div class="text-[11px] text-slate-400 mt-0.5">${s.gate}</div>
+                    </div>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded shrink-0 ${s.status === 'GATE' ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'}">${s.time}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderIterationsTable() {
+            const tbody = document.getElementById('iter-table-body');
+            let totalAi = 0, totalHuman = 0, totalCost = 0;
+            tbody.innerHTML = iterations.map(it => {
+                totalAi += it.aiMin;
+                totalHuman += it.humanMin;
+                totalCost += it.cost;
+                return `
+                    <tr>
+                        <td class="py-2 px-2 font-semibold text-white">${it.ver}</td>
+                        <td class="py-2 px-2 text-right font-mono text-[#5CD6D6]">${it.aiMin}m</td>
+                        <td class="py-2 px-2 text-right font-mono text-amber-400">${it.humanMin}m</td>
+                        <td class="py-2 px-2 text-right font-mono text-emerald-400">$${it.cost.toFixed(2)}</td>
+                        <td class="py-2 px-2 text-slate-300">${it.note}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            const totalMin = totalAi + totalHuman;
+            const humanRatio = totalMin > 0 ? ((totalHuman / totalMin) * 100).toFixed(1) : '0.0';
+            document.getElementById('iter-total-time').textContent = `${totalMin} 分鐘`;
+            document.getElementById('iter-human-ratio').textContent = `${humanRatio}%`;
+            document.getElementById('iter-total-cost').textContent = `US$ ${totalCost.toFixed(2)}`;
+            updateSopPreview(totalMin, humanRatio, totalCost);
+        }
+
+        function updateSopPreview(totalMin, humanRatio, totalCost) {
+            const spec = document.getElementById('pipeline-spec-input').value.trim();
+            const sop = `# 《AI 可重複軟體生產流水線操作手冊 初版 v1.0》
+
+## 一、流水線核心鐵則
+- **人類職責邊界**：我本人只負責「輸入標準化 YAML 需求規格」、「確認核心毛利/定價規則」與「最終上線簽核」，絕對不親自手寫業務迴圈或肉眼查錯。
+- **當前流水線績效**：平均單次完整交付耗時 ${totalMin} 分鐘｜人工介入佔比 ${humanRatio}%｜平均 API 成本 US$ ${totalCost.toFixed(2)}。
+
+## 二、標準化需求輸入規格 (當前鎖定專案)
+[YAML_START]
+${spec}
+[YAML_END]
+
+## 三、四階段多步提示詞 (Multi-Step Agent 鏈)
+1. **Step 1 [Architect Prompt]**：輸入上方 YAML，強制 AI 輸出 schema_contract.json 與模組邊界，不准寫實作碼。
+2. **Step 2 [Builder Prompt]**：根據 schema_contract.json 生成單一可執行檔與結構化 JSONL 日誌。
+3. **Step 3 [Auto-QA Loop]**：自動生成並執行 5 組邊界測試；若 Exit Code != 0，將 Traceback 直接餵回 Step 2 自動修補（上限 3 次）。
+4. **Step 4 [Release & Monitor]**：掛載 daily_healthcheck.py 並寫入版本成本帳本。`;
+            document.getElementById('pipeline-sop-preview').textContent = sop;
+        }
+
+        document.getElementById('btn-run-decomposer').addEventListener('click', () => {
+            renderPipelineDecomposer();
+            renderIterationsTable();
+        });
+
+        document.getElementById('btn-add-iter').addEventListener('click', () => {
+            const ver = document.getElementById('iter-version').value.trim() || 'v1.x 新增迭代';
+            const aiMin = parseFloat(document.getElementById('iter-ai-min').value) || 5;
+            const humanMin = parseFloat(document.getElementById('iter-human-min').value) || 1;
+            const cost = parseFloat(document.getElementById('iter-cost').value) || 0.05;
+            const note = document.getElementById('iter-bottleneck').value.trim() || '常規優化';
+            iterations.push({ ver, aiMin, humanMin, cost, note });
+            renderIterationsTable();
+        });
+
+        document.getElementById('btn-export-sop').addEventListener('click', () => {
+            renderPipelineDecomposer();
+            renderIterationsTable();
+        });
+
+        document.getElementById('btn-copy-sop').addEventListener('click', () => {
+            copyTextSafe(document.getElementById('pipeline-sop-preview').textContent);
+            const btn = document.getElementById('btn-copy-sop');
+            btn.textContent = '已複製手冊全文！';
+            setTimeout(() => btn.textContent = '複製完整操作手冊 (.md)', 2000);
+        });
+
+        // ==========================================
+        // 5. Module 4: Monitoring, Diagnosis & ROI
+        // ==========================================
+        let telemetryChartInstance = null;
+        let chartSeriesRuns = [38, 42, 40, 44, 41, 46, 45];
+        let chartSeriesErr = [1.2, 0.9, 1.5, 1.1, 1.8, 4.2, 6.8];
+
+        function initOrUpdateChart() {
+            const ctx = document.getElementById('telemetryChart');
+            if (!ctx) return;
+            if (telemetryChartInstance) {
+                telemetryChartInstance.data.datasets[0].data = chartSeriesRuns;
+                telemetryChartInstance.data.datasets[1].data = chartSeriesErr;
+                telemetryChartInstance.update();
+                return;
+            }
+            telemetryChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['D-6', 'D-5', 'D-4', 'D-3', 'D-2', '昨日', '今日'],
+                    datasets: [
+                        {
+                            label: '每日自動執行次數',
+                            data: chartSeriesRuns,
+                            borderColor: '#5CD6D6',
+                            backgroundColor: 'rgba(92, 214, 214, 0.15)',
+                            tension: 0.35,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '錯誤率 (%)',
+                            data: chartSeriesErr,
+                            borderColor: '#F43F5E',
+                            backgroundColor: 'rgba(244, 63, 94, 0.15)',
+                            tension: 0.35,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#CBD5E1', font: { size: 11 } } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#94A3B8' }, grid: { color: '#1E293B' } },
+                        y: { position: 'left', ticks: { color: '#5CD6D6' }, grid: { color: '#1E293B' } },
+                        y1: { position: 'right', ticks: { color: '#F43F5E' }, grid: { drawOnChartArea: false } }
+                    }
+                }
+            });
+        }
+
+        function computeMonitoringRoi() {
+            const runsPerDay = parseFloat(document.getElementById('mon-runs').value) || 0;
+            const errRate = parseFloat(document.getElementById('mon-err-rate').value) || 0;
+            const latency = parseFloat(document.getElementById('mon-latency').value) || 0;
+            const savedMinPerRun = parseFloat(document.getElementById('mon-saved-min').value) || 0;
+            const hourlyWage = parseFloat(document.getElementById('mon-hourly-wage').value) || 0;
+            const apiCost = parseFloat(document.getElementById('mon-api-cost').value) || 0;
+
+            const monthlyHours = (runsPerDay * savedMinPerRun * 30) / 60;
+            const netSavedNtd = Math.round((monthlyHours * hourlyWage) - apiCost);
+
+            document.getElementById('roi-hours-saved').textContent = `${monthlyHours.toFixed(1)} 小時 / 月`;
+            document.getElementById('roi-money-saved').textContent = `NT$ ${netSavedNtd.toLocaleString('zh-TW')}`;
+
+            const badge = document.getElementById('roi-alert-badge');
+            const desc = document.getElementById('roi-alert-desc');
+            if (errRate > 2.0 || latency > 2500) {
+                badge.className = 'text-base font-black text-rose-400 mt-1';
+                badge.textContent = `🚨 CRITICAL: 錯誤率 ${errRate}% (閾值 >2.0%)`;
+                desc.textContent = `P95 延遲 ${latency}ms — 已觸發 AI 自動診斷並鎖定異常欄位`;
+            } else {
+                badge.className = 'text-base font-black text-emerald-400 mt-1';
+                badge.textContent = `✅ HEALTHY: 錯誤率 ${errRate}% 符合生產標準`;
+                desc.textContent = `P95 延遲 ${latency}ms — 系統穩定創造被動省時效益`;
+            }
+
+            chartSeriesRuns[6] = runsPerDay;
+            chartSeriesErr[6] = errRate;
+            initOrUpdateChart();
+        }
+
+        ['mon-runs', 'mon-err-rate', 'mon-latency', 'mon-saved-min', 'mon-hourly-wage', 'mon-api-cost'].forEach(id => {
+            document.getElementById(id).addEventListener('input', computeMonitoringRoi);
+        });
+
+        document.getElementById('btn-sim-normal').addEventListener('click', () => {
+            document.getElementById('mon-runs').value = 52;
+            document.getElementById('mon-err-rate').value = 0.6;
+            document.getElementById('mon-latency').value = 680;
+            computeMonitoringRoi();
+        });
+
+        document.getElementById('btn-sim-spike').addEventListener('click', () => {
+            document.getElementById('mon-runs').value = 45;
+            document.getElementById('mon-err-rate').value = 6.8;
+            document.getElementById('mon-latency').value = 1850;
+            computeMonitoringRoi();
+        });
+
+        function runLogDiagnosis() {
+            const rawLog = document.getElementById('mon-log-input').value.trim();
+            const out = document.getElementById('mon-diagnosis-output');
+            out.innerHTML = `
+                <div class="text-[#5CD6D6] font-extrabold">🔍 AI 自動根因診斷 (Root Cause)：</div>
+                <p class="text-slate-300">外部廠商上傳之 CSV 金額欄位帶有中文備註字串 <code>(含稅)/(未稅)</code> 與千分位逗號，導致直接 <code>float()</code> 轉型失敗。</p>
+                <div class="text-emerald-400 font-extrabold pt-1">🛠️ 自動生成修復建議 (Hotfix Patch)：</div>
+                <pre class="bg-[#0A0E14] p-2 rounded text-[11px] font-mono text-emerald-300 overflow-x-auto">clean_val = float(re.sub(r'[^0-9.-]', '', str(raw_cell)) or 0.0)</pre>
+                <div class="text-amber-300 font-extrabold pt-1">📋 已轉化為下一版迭代輸入規格 (Backlog Item #14)：</div>
+                <p class="text-slate-300">「在金額清洗層新增備註剝離器，並將『含稅/未稅』自動拆分為獨立布林欄位 <code>is_tax_included</code>，若為含稅價則自動除以 1.05 還原未稅單價後再比對。」</p>
+            `;
+        }
+        document.getElementById('btn-diagnose-log').addEventListener('click', runLogDiagnosis);
+
+        // ==========================================
+        // 6. Module 5: Daily Mandatory Review (5 Questions)
+        // ==========================================
+        function generateDailyAudit() {
+            const act = document.getElementById('audit-actions').value.trim();
+            const rawPrompt = document.getElementById('audit-raw-prompt').value.trim();
+            const hasManual = act.includes('手動') || act.includes('肉眼') || act.includes('自己');
+            const scoreLevel = hasManual ? '低（假忙警告）' : '高（直接推進變現）';
+            const scoreColor = hasManual ? 'text-rose-400 bg-rose-950/50 border-rose-700' : 'text-emerald-400 bg-emerald-950/50 border-emerald-700';
+
+            const container = document.getElementById('audit-results-container');
+            container.innerHTML = `
+                <div class="p-3.5 rounded-xl bg-[#0A0E14] border border-slate-800 space-y-1">
+                    <div class="text-xs font-black text-rose-400">1. 你今天有哪些步驟其實可以完全交給 AI，但你還是自己做了？</div>
+                    <p class="text-xs text-slate-200 leading-relaxed">
+                        ${hasManual
+                            ? '你居然花寶貴的時間「自己手動打開 Excel 改欄位名稱」跟「肉眼檢查超過 10 萬的價差」！這兩件事 100% 應該交給 AI 寫一段 15 行的欄位同義詞映射字典 (Header Alias Mapper) 自動處理。你每多手動改一個檔案，就是在摧毀這套系統的毛利。'
+                            : '今日核心清洗與比對皆已交由腳本執行，但「將結果轉發給客戶確認」仍由人工複製貼上，明日應改為自動產出帶簽核連結的報表。'}
+                    </p>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-[#0A0E14] border border-slate-800 space-y-1.5">
+                    <div class="text-xs font-black text-[#5CD6D6]">2. 你今天寫得低效的 Prompt 診斷與教練強制改寫版：</div>
+                    <div class="text-[11px] text-rose-300">❌ 你的原句：「${rawPrompt}」→ 缺少輸入欄位、缺少異常閾值、缺少錯誤處理與輸出格式。</div>
+                    <div class="text-[11px] text-emerald-300 font-bold">✅ 教練改寫後的高效生產級 Prompt：</div>
+                    <pre class="bg-[#131924] p-2.5 rounded border border-slate-700 text-[11px] font-mono text-slate-200 whitespace-pre-wrap">請寫一個 Python CLI 腳本，讀取兩份欄位命名可能不同但代表【工項代碼、名稱、數量、單價、複價】的 CSV/Excel。先用同義詞字典自動對齊欄位，再標出「複價差距 >= 100,000」或「廠商成本佔比 > 70%」的項目，輸出紅字標記的 audit_report.xlsx 與結構化 audit.jsonl 日誌，並附帶 3 組 pytest 測試。</pre>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-[#0A0E14] border border-slate-800 space-y-1">
+                    <div class="text-xs font-black text-[#5CD6D6]">3. 若要把今天的做法變成「可重複的標準流程」，還缺哪三個關鍵文件或規則？</div>
+                    <ul class="text-xs text-slate-200 list-disc pl-4 space-y-1">
+                        <li><strong>《輸入資料清洗與欄位映射表 (<code>schema_alias.json</code>)》：</strong> 定義各家廠商常見的表頭別名（如「複價/小計/總金額」統一映射為 <code>amount</code>）。</li>
+                        <li><strong>《異常告警與退件判定規則 (<code>audit_policy.yaml</code>)》：</strong> 明確寫死價差 >10 萬、毛利 <30% 或單價偏離歷史均價 >15% 的處置等級。</li>
+                        <li><strong>《上線前自動化驗收清單 (run_pipeline.sh)》：</strong> 規定任何修改未通過 5 組邊界測試前，禁止交付給客戶。</li>
+                    </ul>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-[#0A0E14] border border-slate-800 space-y-1">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-black text-[#5CD6D6]">4. 以「創造現金流」的角度來看，今天的練習對商業目標的貢獻度：</span>
+                        <span class="text-xs font-black px-2.5 py-0.5 rounded border ${scoreColor}">貢獻度：${scoreLevel}</span>
+                    </div>
+                    <p class="text-xs text-slate-200 leading-relaxed">
+                        ${hasManual
+                            ? '原因：你雖然寫了程式，但最後還是靠自己當人工女工去改 Excel 表頭。只要還需要你手動改檔案，這個服務就無法規模化複製，也無法以高毛利賣給同行。'
+                            : '原因：你已經把「人工對帳 3 小時」壓縮成「AI 自動執行 3 秒鐘」，這套資產已經具備直接向同行收取單次 NT$ 3,500 代審費或出售內部工具的商業價值。'}
+                    </p>
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-gradient-to-r from-rose-950/40 to-[#131924] border border-rose-500/40 space-y-1">
+                    <div class="text-xs font-black text-rose-300">5. 明天你必須改進的唯一一件事（冷酷指令）：</div>
+                    <p class="text-xs text-white font-bold leading-relaxed">
+                        明天嚴格禁止手動打開任何一個客戶或廠商的原始 Excel 修改表頭！在開始寫任何新功能前，先用 AI 寫好「自動識別表頭欄位」的預處理器，並拿給至少 1 位同行看輸出的稽核報表詢問付費意願。
+                    </p>
+                </div>
+            `;
+        }
+
+        document.getElementById('btn-run-audit').addEventListener('click', generateDailyAudit);
+        document.getElementById('btn-audit-sample-bad').addEventListener('click', () => {
+            document.getElementById('audit-actions').value = '今天用 AI 寫了一個比對廠商請款跟合約金額的 Python 腳本，但因為廠商的 Excel 欄位名稱不一樣，我花了一小時自己手動打開 8 個 Excel 檔把欄位名稱改統一，還自己用肉眼檢查哪幾筆金額差超過 10 萬。';
+            document.getElementById('audit-raw-prompt').value = '幫我寫一個可以比對兩個 Excel 報價單的 Python 程式，如果金額不一樣就標出來，要寫得清楚一點。';
+            generateDailyAudit();
+        });
+        document.getElementById('btn-audit-sample-good').addEventListener('click', () => {
+            document.getElementById('audit-actions').value = '今天用標準 YAML 規格讓 AI 生成標單自動比對工具與 pytest 測試，零手動修改表頭，3 秒內抓出育成專案中價差超過 10 萬的 4 個工項，並將報表發給 3 位同行老闆詢問代審合作。';
+            document.getElementById('audit-raw-prompt').value = '請根據 contract_schema.json 建立具備錯誤日誌與金額正則清洗的比對 CLI，標出價差>10萬且毛利<30%之項目。';
+            generateDailyAudit();
+        });
+
+        // ==========================================
+        // 7. Modals & Initial Boot
+        // ==========================================
+        const modalRules = document.getElementById('modal-rules');
+        const modalIos = document.getElementById('modal-ios');
+
+        document.getElementById('btn-rules-modal').addEventListener('click', () => {
+            modalRules.classList.remove('hidden');
+            modalRules.classList.add('flex');
+        });
+        ['btn-close-rules', 'btn-ack-rules'].forEach(id => {
+            document.getElementById(id).addEventListener('click', () => {
+                modalRules.classList.add('hidden');
+                modalRules.classList.remove('flex');
+            });
+        });
+
+        document.getElementById('btn-ios-modal').addEventListener('click', () => {
+            modalIos.classList.remove('hidden');
+            modalIos.classList.add('flex');
+        });
+        document.getElementById('btn-close-ios').addEventListener('click', () => {
+            modalIos.classList.add('hidden');
+            modalIos.classList.remove('flex');
+        });
+        document.getElementById('btn-copy-ios-script').addEventListener('click', () => {
+            copyTextSafe(document.getElementById('ios-script-box').textContent);
+            const btn = document.getElementById('btn-copy-ios-script');
+            btn.textContent = '已複製腳本！';
+            setTimeout(() => btn.textContent = '複製上架腳本', 2000);
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderDrill(0);
+            renderPipelineDecomposer();
+            renderIterationsTable();
+            runLogDiagnosis();
+            generateDailyAudit();
+            updateChecklistProgress();
+        });
+    </script>
+</body>
+</html>
